@@ -1,0 +1,54 @@
+{
+  "name": "@shaharmor/websocket-server",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://github.com/shaharmor/websocket-server",
+  "bugs": {
+    "url": "https://github.com/shaharmor/websocket-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaharmor/websocket-server.git"
+  },
+  "author": {
+    "name": "Shahar Mor"
+  },
+  "main": "dist/websocker-server.js",
+  "types": "dist/websocker-server.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "ts-node-dev --transpile-only --project ./tsconfig.build.json -r tsconfig-paths/register test/run.ts",
+    "lint": "npm run lint:eslint && npm run lint:tsc",
+    "lint:tsc": "tsc --noEmit -p ./tsconfig.json",
+    "lint:eslint": "eslint . --max-warnings 0",
+    "lint:eslint:fix": "npm run lint:eslint -- --fix",
+    "prepublish": "npm run build",
+    "setup": "npm ci",
+    "test": "jest"
+  },
+  "dependencies": {
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v19.3.0"
+  },
+  "devDependencies": {
+    "@shaharmor/eslint-config": "7.29.0",
+    "@shaharmor/prettier-config": "2.2.0",
+    "@shaharmor/tsconfig": "4.1.7",
+    "@types/jest": "26.0.23",
+    "@types/node": "15.12.5",
+    "@types/ws": "7.4.5",
+    "eslint": "7.29.0",
+    "husky": "6.0.0",
+    "jest": "27.0.6",
+    "lint-staged": "11.0.0",
+    "prettier": "2.3.2",
+    "sort-package-json": "1.50.0",
+    "ts-jest": "27.0.3",
+    "ts-node": "10.0.0",
+    "ts-node-dev": "1.1.7",
+    "typescript": "4.3.4",
+    "ws": "7.5.1"
+  }
+}

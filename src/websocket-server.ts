@@ -10,16 +10,27 @@ import { Hook } from '@/decorators/hook';
 import { WebSocketClient } from '@/websocket-client';
 
 type WebSocketServerAuthCallback<ClientData> = (allowed: boolean, userData?: ClientData) => void;
-type WebSocketServerAuthHandler<ClientData> = (url: string, callback: WebSocketServerAuthCallback<ClientData>) => void;
+type WebSocketServerAuthHandler<ClientData> = (
+  data: WebSocketServerAuthData,
+  callback: WebSocketServerAuthCallback<ClientData>
+) => void;
 type WebSocketServerConnectionHandler = (ws: WebSocketClient) => void;
 type WebSocketServerCloseHandler = () => void;
 type WebSocketMessageHandler = (buffer: ArrayBuffer) => void;
 type WebSocketCloseHandler = () => void;
 
+export interface WebSocketServerAuthData {
+  url: string;
+  ip: string;
+  headers: Map<string, string>;
+}
+
 export interface ExtendedWebSocket extends WebSocket {
   onMessage?: WebSocketMessageHandler;
   onClose?: WebSocketCloseHandler;
   url: string;
+  ip: string;
+  headers: Map<string, string>;
 }
 
 export class WebSocketServer<ClientData extends Record<string, unknown> = Record<string, unknown>> {
@@ -48,9 +59,12 @@ export class WebSocketServer<ClientData extends Record<string, unknown> = Record
         const secWebSocketKey = req.getHeader('sec-websocket-key');
         const secWebSocketProtocol = req.getHeader('sec-websocket-protocol');
         const secWebSocketExtensions = req.getHeader('sec-websocket-extensions');
+        const headers = new Map();
+        req.forEach((key, value) => headers.set(key, value));
+        const ip = Buffer.from(res.getRemoteAddressAsText()).toString();
 
         if (!this.onAuth) {
-          res.upgrade({ url }, secWebSocketKey, secWebSocketProtocol, secWebSocketExtensions, context);
+          res.upgrade({ url, ip, headers }, secWebSocketKey, secWebSocketProtocol, secWebSocketExtensions, context);
           return;
         }
 
@@ -58,7 +72,7 @@ export class WebSocketServer<ClientData extends Record<string, unknown> = Record
         let clientAborted = false;
         res.onAborted(() => (clientAborted = true)); // eslint-disable-line no-return-assign
 
-        this.onAuth(url, (allowed, extraClientData) => {
+        this.onAuth({ url, ip, headers }, (allowed, extraClientData) => {
           if (clientAborted) {
             return;
           }
@@ -69,7 +83,7 @@ export class WebSocketServer<ClientData extends Record<string, unknown> = Record
           }
           setImmediate(() =>
             res.upgrade(
-              { ...extraClientData, url },
+              { ...extraClientData, url, ip, headers },
               secWebSocketKey,
               secWebSocketProtocol,
               secWebSocketExtensions,

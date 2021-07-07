@@ -9,8 +9,9 @@ describe('websocket-client', () => {
       send: jest.fn(),
       close: jest.fn(),
       end: jest.fn(),
-      getRemoteAddressAsText: jest.fn(() => Buffer.from('1.1.1.1', 'utf8')),
+      ip: '1.1.1.1',
       url: 'ws://sub.domain.com/path?key=value',
+      headers: new Map([['key', 'value']]),
     } as unknown as ExtendedWebSocket;
   });
 
@@ -23,6 +24,18 @@ describe('websocket-client', () => {
     it('.url', () => {
       const client = new WebSocketClient(socket);
       expect(client.url).toEqual('ws://sub.domain.com/path?key=value');
+    });
+  });
+
+  describe('.getHeader', () => {
+    it('returns undefined for an unknown header', () => {
+      const client = new WebSocketClient(socket);
+      expect(client.getHeader('unknown')).toEqual(undefined);
+    });
+
+    it('returns correct value for a known header', () => {
+      const client = new WebSocketClient(socket);
+      expect(client.getHeader('key')).toEqual('value');
     });
   });
 

@@ -8,6 +8,7 @@ describe('websocket-server', () => {
   let ws2: WebSocket;
   let server: WebSocketServer;
   let server2: WebSocketServer;
+
   beforeEach(async () => {
     server = new WebSocketServer();
     server2 = new WebSocketServer();
@@ -182,11 +183,14 @@ describe('websocket-server', () => {
   });
 
   describe('auth', () => {
-    it('passes the full url to the onAuth callback', () => {
+    it('passes the url, ip & headers to the onAuth callback', () => {
       return new Promise<void>((resolve, reject) => {
-        server.onAuth = (url, callback) => {
+        server.onAuth = (data, callback) => {
           try {
-            expect(url).toEqual(`ws://localhost:${server.port}/some/path?key=value`);
+            expect(data.url).toEqual(`ws://localhost:${server.port}/some/path?key=value`);
+            expect(typeof data.ip).toEqual('string'); // TODO: test against IPv4 & IPv6
+            expect(data.headers).toBeInstanceOf(Map);
+            expect(data.headers.get('myheader')).toEqual('myValue');
             resolve();
           } catch (err) {
             reject(err);
@@ -195,7 +199,11 @@ describe('websocket-server', () => {
           }
         };
 
-        ws1 = new WebSocket(`ws://localhost:${server.port}/some/path?key=value`);
+        ws1 = new WebSocket(`ws://localhost:${server.port}/some/path?key=value`, {
+          headers: {
+            myHeader: 'myValue',
+          },
+        });
       });
     });
 

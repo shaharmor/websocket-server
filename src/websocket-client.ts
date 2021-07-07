@@ -9,7 +9,7 @@ export class WebSocketClient {
   @Hook public onClose?: WebSocketClientCloseHandler;
 
   public get ip(): string {
-    return Buffer.from(this.socket.getRemoteAddressAsText()).toString();
+    return this.socket.ip;
   }
 
   public get url(): string {
@@ -19,6 +19,10 @@ export class WebSocketClient {
   constructor(private readonly socket: ExtendedWebSocket) {
     this.socket.onMessage = (buffer) => this.onMessage?.(buffer);
     this.socket.onClose = () => this.onClose?.();
+  }
+
+  public getHeader(key: string): string | undefined {
+    return this.socket.headers.get(key);
   }
 
   public send(buffer: Uint8Array): void {

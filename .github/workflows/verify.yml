@@ -1,28 +1,28 @@
-name: PR
+name: Verify
 
 on:
   pull_request:
     branches:
-      - master
-
-env:
-  OS_VERSION: ubuntu-latest
+      - main
+  push:
+    branches:
+      - main
 
 jobs:
   lint-eslint:
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: bahmutov/npm-install@v1
       - run: npm run lint:eslint
   lint-tsc:
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: bahmutov/npm-install@v1
       - run: npm run lint:tsc
   test:
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: bahmutov/npm-install@v1

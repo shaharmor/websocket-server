@@ -1,4 +1,4 @@
-name: release-please
+name: Release please
 
 on:
   push:
@@ -11,17 +11,16 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
-          package-name: release-please-action
+          package-name: websocket-server
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
       - uses: bahmutov/npm-install@v1
         if: ${{ steps.release.outputs.release_created }}
       - name: Publish
+        if: ${{ steps.release.outputs.release_created }}
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm publish --ignore-scripts
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: ${{ steps.release.outputs.release_created }}

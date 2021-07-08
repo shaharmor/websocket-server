@@ -13,6 +13,7 @@ jobs:
         with:
           release-type: node
           package-name: websocket-server
+          token: ${{ secrets.GH_TOKEN }}
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
       - uses: bahmutov/npm-install@v1
